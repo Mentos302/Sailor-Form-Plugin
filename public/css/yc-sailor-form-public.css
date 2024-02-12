@@ -1,8 +1,39 @@
-.yc_custom_radio_checkbox input
-{
+.yc_custom_radio_checkbox input {
   margin-top: 8px !important;
 }
+.wpmc-step-item.yc_sailors_form::before {
+  /* Only insert the pseudo-element if there's an odd number of children */
+  content: "";
+  display: block;
+}
 
-.wpmc-step-item.yc_sailors_form .woocommerce form .form-row.woocommerce-invalid label{
+.wpmc-step-item.yc_sailors_form:nth-last-child(2):nth-child(odd)::before {
+  /* This targets the second-to-last child, but only if it's odd, 
+     effectively making this apply only when there's an odd total number. */
+  content: none; /* Don't actually insert anything, just use this to occupy space */
+}
 
+.wpmc-step-item.yc_sailors_form.current {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 8px;
+  column-gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .wpmc-step-item.yc_sailors_form {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wpmc-step-item.yc_sailors_form p {
+  width: 100% !important;
+}
+
+.woocommerce form .yc_sailors_form .form-row .input-checkbox {
+  margin: 10px 4px 0 0 !important;
+}
+
+.woocommerce form .yc_sailors_form .form-row input[type="radio"] {
+  margin: 10px 4px 0 0 !important;
 }

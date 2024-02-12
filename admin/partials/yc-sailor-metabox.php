@@ -1,121 +1,122 @@
 <div class="wrap">
-<table class="widefat cabin-table services_fields">
-    <tbody>
-<?php
-    foreach ( $order->get_items() as $item_id => $item ) {
-        $product = $item->get_product(); 
-        $product_id = $product->get_id();
-        if (has_term( 'merchandise', 'product_cat', $product_id )) {
-                continue;
-            }
-        $quantity = $item->get_quantity();
-        $counter = 1;
-        echo "<tr><td>";
-        echo "<h1>Product Name : ".$product->get_name()."</h1>";
-        echo "</td></tr><tr><td>";
-        while ($counter <= $quantity) {
-        woocommerce_form_field( 'yc_firstname_'.$product_id.'_pid_qty_'.$counter, array(
-            'type'  => 'text',
-            'required'  => true, 
-            'class' => array('input-text form-row-first'),
-            'label' => __('Sailor First Name'),
-        ), $order->get_meta( 'yc_firstname_'.$product_id.'_pid_qty_'.$counter ) );
+    <table class="widefat cabin-table services_fields">
+        <tbody>
+            <?php
+			$excluded_categories = get_option( 'sailor_form_excluded_categories', array() );
 
-        woocommerce_form_field( 'yc_lastname_'.$product_id.'_pid_qty_'.$counter, array(
-            'type'  => 'text',
-            'required'  => true, 
-            'class' => array('input-text form-row-last'),
-            'label' => __('Sailor Last Name'),
-        ), $order->get_meta( 'yc_lastname_'.$product_id.'_pid_qty_'.$counter ) );
+			function map_acf_type_to_wc( $acf_type ) {
+				$mapping = [ 
+					'text' => 'text',
+					'textarea' => 'textarea',
+					'email' => 'email',
+					'select' => 'select',
+					'checkbox' => 'checkbox',
+					'radio' => 'radio',
+					'date_picker' => 'date',
+				];
+				return isset( $mapping[ $acf_type ] ) ? $mapping[ $acf_type ] : 'text';
+			}
 
-        woocommerce_form_field( 'yc_dob_'.$product_id.'_pid_qty_'.$counter, array(
-            'type'  => 'date',
-            'required'  => true, 
-            'class' => array('input-text form-row-first'),
-            'label' => __('Sailor Date of Birth'),
-        ), $order->get_meta( 'yc_dob_'.$product_id.'_pid_qty_'.$counter ) );
+			function get_wc_field_class( $type ) {
+				$classes = [ 
+					'text' => 'form-row-first',
+					'email' => 'form-row-first',
+					'date' => 'form-row-first',
+					'textarea' => 'form-row-last',
+					'checkbox' => 'form-row-wide',
+				];
+				return isset( $classes[ $type ] ) ? $classes[ $type ] : 'form-row-wide';
+			}
 
-        woocommerce_form_field( 'yc_allergy_'.$product_id.'_pid_qty_'.$counter, array(
-            'type'  => 'textarea',
-            'required'  => true, 
-            'class' => array('input-text form-row-last'),
-            'label' => __('Sailor Allergies/Medical Conditions'),
-        ), $order->get_meta( 'yc_allergy_'.$product_id.'_pid_qty_'.$counter ) );
+			foreach ( $order->get_items() as $item_id => $item ) {
+				$product = $item->get_product();
+				$product_id = $product->get_id();
 
-        woocommerce_form_field( 'yc_guardianfirst_'.$product_id.'_pid_qty_'.$counter, array(
-            'type'  => 'text',
-            'required'  => true, 
-            'class' => array('input-text form-row-first'),
-            'label' => __('Parent / Guardian First Name'),
-        ), $order->get_meta( 'yc_guardianfirst_'.$product_id.'_pid_qty_'.$counter ) );
+				$skip_product = false;
+				$terms = get_the_terms( $product_id, 'product_cat' );
 
-        woocommerce_form_field( 'yc_guardianlast_'.$product_id.'_pid_qty_'.$counter, array(
-            'type'  => 'text',
-            'required'  => true, 
-            'class' => array('input-text form-row-last'),
-            'label' => __('Parent / Guardian Last Name'),
-        ), $order->get_meta( 'yc_guardianlast_'.$product_id.'_pid_qty_'.$counter ) );
+				if ( $terms ) {
+					foreach ( $terms as $term ) {
+						if ( array_key_exists( $term->term_id, $excluded_categories ) ) {
+							$skip_product = true;
+							break;
+						}
+					}
+				}
 
-        woocommerce_form_field( 'yc_guardiantel_'.$product_id.'_pid_qty_'.$counter, array(
-            'type'  => 'tel',
-            'required'  => true, 
-            'class' => array('input-text form-row-first'),
-            'label' => __('Parent / Guardian Contact phone'),
-        ), $order->get_meta( 'yc_guardiantel_'.$product_id.'_pid_qty_'.$counter ) );
+				if ( $skip_product ) {
+					continue;
+				}
 
-        woocommerce_form_field( 'yc_guardianmail_'.$product_id.'_pid_qty_'.$counter, array(
-            'type'  => 'email',
-            'required'  => true, 
-            'class' => array('input-text form-row-last'),
-            'label' => __('Parent / Guardian Contact email'),
-        ), $order->get_meta( 'yc_guardianmail_'.$product_id.'_pid_qty_'.$counter ) );
+				$quantity = $item->get_quantity();
+				$counter = 1;
+				echo "<tr><td>";
+				echo "<h1>Product Name : " . $product->get_name() . "</h1>";
+				echo "</td></tr><tr><td>";
 
-        woocommerce_form_field( 'yc_permissionvideo_'.$product_id.'_pid_qty_'.$counter, array(
-            'type'  => 'radio',
-            'required'  => true, 
-            'class' => array('input-text form-row-first'),
-            'label' => __('Permission to be videoed/ photographed'),
-            'options' => array( 'NO' => 'NO','Yes' => 'Yes'),
-        ), $order->get_meta( 'yc_permissionvideo_'.$product_id.'_pid_qty_'.$counter ) );
 
-        woocommerce_form_field( 'yc_permissionleave_'.$product_id.'_pid_qty_'.$counter, array(
-            'type'  => 'radio',
-            'required'  => true, 
-            'class' => array('input-text form-row-last'),
-            'label' => __('Permission to leave club premises during the day'),
-            'options' => array( 'NO' => 'NO','Yes' => 'Yes'),
-        ), $order->get_meta( 'yc_permissionleave_'.$product_id.'_pid_qty_'.$counter ) );
 
-        woocommerce_form_field( 'yc_permissionirishdb_'.$product_id.'_pid_qty_'.$counter, array(
-            'type'  => 'radio',
-            'required'  => true, 
-            'class' => array('input-text form-row-first'),
-            'label' => __('Permission to add to Irish Sailing database'),
-            'options' => array( 'NO' => 'NO','Yes' => 'Yes')
-        ), $order->get_meta( 'yc_permissionirishdb_'.$product_id.'_pid_qty_'.$counter ) );
-        // if ($order->get_meta( 'yc_clubuse_'.$product_id.'_pid_qty_'.$counter )) {
-        // woocommerce_form_field( 'yc_clubuse_'.$product_id.'_pid_qty_'.$counter, array(
-        //     'type'  => 'checkbox',
-        //     'required'  => true, 
-        //     'class' => array('input-text form-row-last'),
-        //     'label' => __('I understand that Howth Yacht Club may use the contact information I have provided to send communications relating to the sailing course'),
-        // ), $order->get_meta( 'yc_clubuse_'.$product_id.'_pid_qty_'.$counter ) );
-        // }
-        // if ($order->get_meta( 'yc_liability_'.$product_id.'_pid_qty_'.$counter )) {
-        // woocommerce_form_field( 'yc_liability_'.$product_id.'_pid_qty_'.$counter, array(
-        //     'type'  => 'checkbox',
-        //     'required'  => true, 
-        //     'class' => array('input-text form-row-last'),
-        //     'label' => __('I understand that no liability is attached to Howth Yacht Club, its members or servants, for any loss or damage to property or for injury sustained by any child enrolled for this tuition.'),
-        // ), $order->get_meta( 'yc_liability_'.$product_id.'_pid_qty_'.$counter ) );
-        // }
-        $counter++;
-    }
-    echo "</td></tr>";
-}   
-?>
+				for ( $counter = 1; $counter <= $quantity; $counter++ ) {
+					$fields = acf_get_fields( 'group_65ca89c5dd7d1' );
+					foreach ( $fields as $field ) {
+						if ( $field['type'] === 'checkbox' ) {
+							continue;
+						}
+						$field_key = 'yc_' . $field['name'] . '_' . $product_id . '_pid_qty_' . $counter;
+						$class = get_wc_field_class( map_acf_type_to_wc( $field['type'] ) );
+						$class .= ' disabled-input';
+						woocommerce_form_field( $field_key, [ 
+							'type' => map_acf_type_to_wc( $field['type'] ),
+							'required' => $field['required'],
+							'class' => [ $class ],
+							'label' => __( $field['label'] ),
+							'options' => isset( $field['choices'] ) ? $field['choices'] : [],
+						], get_post_meta( $order->get_id(), $field_key, true ) );
+					}
+				}
+
+
+				echo "</td></tr>";
+			}
+			?>
             </td>
-        </tr>
-</tbody>
-</table>
+            </tr>
+        </tbody>
+    </table>
+    <style>
+    .services_fields td {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px !important;
+    }
+
+    .services_fields p {
+        width: 100% !important;
+    }
+
+    .services_fields .disabled-input {
+        pointer-events: none;
+    }
+
+    .services_fields input[type="radio"] {
+        display: none;
+    }
+
+    .services_fields input[type="radio"]:checked+label {
+        font-weight: 600;
+
+    }
+
+    .services_fields input[type="radio"]:not(:checked)+label {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .services_fields td {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px !important;
+        }
+    }
+    </style>
 </div>
