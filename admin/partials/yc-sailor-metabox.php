@@ -30,7 +30,7 @@
 
 			foreach ( $order->get_items() as $item_id => $item ) {
 				$product = $item->get_product();
-				$product_id = $product->get_id();
+				$product_id = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
 
 				$skip_product = false;
 				$terms = get_the_terms( $product_id, 'product_cat' );
@@ -53,8 +53,6 @@
 				echo "<tr><td>";
 				echo "<h1>Product Name : " . $product->get_name() . "</h1>";
 				echo "</td></tr><tr><td>";
-
-
 
 				for ( $counter = 1; $counter <= $quantity; $counter++ ) {
 					$fields = acf_get_fields( 'group_65ca89c5dd7d1' );
