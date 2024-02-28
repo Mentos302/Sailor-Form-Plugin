@@ -40,8 +40,8 @@ class Yc_Sailor_Form_Public {
 
 	public function add_plugin_settings_page() {
 		add_options_page(
-			'Sailor Form Settings',
-			'Sailor Form',
+			'Sailors Forms Settings',
+			'Sailors Forms',
 			'manage_options',
 			'sailor-form-settings',
 			array( $this, 'render_settings_page' )
@@ -59,17 +59,17 @@ class Yc_Sailor_Form_Public {
 
 	public function render_settings_page() {
 		?>
-<div class="wrap">
-    <h2>Sailors Forms Settings</h2>
-    <form action="options.php" method="post">
-        <?php
+		<div class="wrap">
+			<h2>Sailors Forms Settings</h2>
+			<form action="options.php" method="post">
+				<?php
 				settings_fields( 'sailor_form_options' );
 				do_settings_sections( 'sailor-form-settings' );
 				submit_button();
 				?>
-    </form>
-</div>
-<?php
+			</form>
+		</div>
+		<?php
 	}
 
 	public function excluded_categories_callback() {
