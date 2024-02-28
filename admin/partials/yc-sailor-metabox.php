@@ -1,8 +1,8 @@
 <div class="wrap">
-    <table class="widefat cabin-table services_fields">
-        <tbody>
-            <?php
-			$excluded_categories = get_option( 'sailor_form_excluded_categories', array() );
+	<table class="widefat cabin-table services_fields">
+		<tbody>
+			<?php
+			$excluded_categories = get_option( 'sailors_forms_categories', array() );
 
 			function map_acf_type_to_wc( $acf_type ) {
 				$mapping = [ 
@@ -35,18 +35,18 @@
 				$skip_product = false;
 				$terms = get_the_terms( $product_id, 'product_cat' );
 
-				if ( $terms ) {
+				if ( is_array( $terms ) ) {
 					foreach ( $terms as $term ) {
-						if ( array_key_exists( $term->term_id, $excluded_categories ) ) {
-							$skip_product = true;
+						if ( isset( $excluded_categories[ $term->term_id ] ) ) {
+							$selected_sailor_form = $excluded_categories[ $term->term_id ];
 							break;
 						}
 					}
 				}
 
-				if ( $skip_product ) {
+				if ( $selected_sailor_form === 'none' )
 					continue;
-				}
+
 
 				$quantity = $item->get_quantity();
 				$counter = 1;
@@ -54,8 +54,24 @@
 				echo "<h1>Product Name : " . $product->get_name() . "</h1>";
 				echo "</td></tr><tr><td>";
 
+				// Switch case to determine field group ID based on selected sailor form
+				switch ( $selected_sailor_form ) {
+					case 'adult':
+						$field_group_id = 'group_65ca89c5dd7d1'; // Adult Sailor Form
+						break;
+					case 'instructor':
+						$field_group_id = 'group_65df2a51e3a24'; // Instructor Sailor Form
+						break;
+					case 'junior':
+						$field_group_id = 'group_65df2a5e9a236'; // Junior Sailor Form
+						break;
+					default:
+						$field_group_id = 'group_65ca89c5dd7d1'; // Default to Adult Sailor Form if no specific Sailor Form is selected
+						break;
+				}
+
 				for ( $counter = 1; $counter <= $quantity; $counter++ ) {
-					$fields = acf_get_fields( 'group_65ca89c5dd7d1' );
+					$fields = acf_get_fields( $field_group_id );
 					foreach ( $fields as $field ) {
 						if ( $field['type'] === 'checkbox' ) {
 							continue;
@@ -73,48 +89,45 @@
 					}
 				}
 
-
 				echo "</td></tr>";
 			}
 			?>
-            </td>
-            </tr>
-        </tbody>
-    </table>
-    <style>
-    .services_fields td {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px !important;
-    }
+		</tbody>
+	</table>
+	<style>
+		.services_fields td {
+			display: grid !important;
+			grid-template-columns: 1fr 1fr;
+			gap: 12px !important;
+		}
 
-    .services_fields p {
-        width: 100% !important;
-    }
+		.services_fields p {
+			width: 100% !important;
+		}
 
-    .services_fields .disabled-input {
-        pointer-events: none;
-    }
+		.services_fields .disabled-input {
+			pointer-events: none;
+		}
 
-    .services_fields input[type="radio"] {
-        display: none;
-    }
+		.services_fields input[type="radio"] {
+			display: none;
+		}
 
-    .services_fields input[type="radio"]:checked+label {
-        font-weight: 600;
+		.services_fields input[type="radio"]:checked+label {
+			font-weight: 600;
 
-    }
+		}
 
-    .services_fields input[type="radio"]:not(:checked)+label {
-        display: none;
-    }
+		.services_fields input[type="radio"]:not(:checked)+label {
+			display: none;
+		}
 
-    @media (max-width: 768px) {
-        .services_fields td {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px !important;
-        }
-    }
-    </style>
+		@media (max-width: 768px) {
+			.services_fields td {
+				display: grid !important;
+				grid-template-columns: 1fr 1fr;
+				gap: 12px !important;
+			}
+		}
+	</style>
 </div>
